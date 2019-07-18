@@ -1,14 +1,17 @@
 <template>
-    <div>
-        <h3>{{movie.title}}</h3>
+    <div :class="{selected: isSelected}">
+        <h3 style="padding-top:0.5rem;">{{movie.title}}</h3>
         <p>
-            <span>Director: </span>{{movie.director}}<br>
-             <span>Img: </span>{{movie.imageUrl}}<br>
-             <span>Duration: </span>{{movie.duration}}<br>
-             <span>Release Date: </span>{{movie.releaseDate}}<br>
-             <span>Genre: </span>{{movie.genre}}
+            <span>Director: </span>{{movie.director}},
+             <span>Duration: </span>{{movie.duration}} min,
+             <span>Release Date: </span>{{movie.releaseDate}},
+             <span>Genre: </span>{{movie.genre}}<br>
+             <span>Img: </span><a href="#">{{movie.imageUrl}}</a>
         </p>
-         <button type="button" class="btn btn-light" @click="handleSelect">Select movie</button>
+         <button type="button" style="margin-bottom:0.5rem;" class="btn btn-light" @click="handleSelect" v-if="isSelected===false">Select movie</button>
+         <button type="button" style="margin-bottom:0.5rem;" class="btn btn-light" @click="handleSelect" v-if="isSelected===true">Deselect movie</button>
+
+
     </div>
 </template>
 
@@ -16,18 +19,14 @@
 export default {
     props:{
         movie: Object,
-        isSelected: Boolean,
+        isSelected: false,
     },
 
     methods: {
         handleSelect() {
             this.$emit('selectMovie', this.movie.id)
-        },
-
-        handleSellectAll() {
-
-        }
-    }
+        }, 
+    }, 
 }
 </script>
 
@@ -42,6 +41,12 @@ export default {
 
     p span {
         color:#6C7A89
+    }
+
+
+    .selected {
+        background: #FEE9E9;
+        border-radius: 2rem;
     }
 
 </style>

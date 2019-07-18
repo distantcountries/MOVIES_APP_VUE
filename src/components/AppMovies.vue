@@ -5,23 +5,23 @@
             <button type="button" class="btn btn-light" @click="deselectAllMovies">Deselect All</button>
         </div>
         <div>
-            <button type="button" class="btn btn-outline-secondary" style="margin:0.2rem;">Sort by Name asc</button>
-            <button type="button" class="btn btn-outline-secondary" style="margin:0.2rem;">Sort by Name desc</button>
-            <button type="button" class="btn btn-outline-secondary" style="margin:0.2rem;">Sort by Duration asc</button>
-            <button type="button" class="btn btn-outline-secondary" style="margin:0.2rem;">Sort by Duration desc</button>
+            <button type="button" class="btn btn-outline-secondary" style="margin:0.2rem;" @click="sortByNameAsc">Sort by Name asc</button>
+            <button type="button" class="btn btn-outline-secondary" style="margin:0.2rem;" @click="sortByNameDesc">Sort by Name desc</button>
+            <button type="button" class="btn btn-outline-secondary" style="margin:0.2rem;" @click="sortByDurationAsc">Sort by Duration asc</button>
+            <button type="button" class="btn btn-outline-secondary" style="margin:0.2rem;" @click="sortByDurationDesc">Sort by Duration desc</button>
         </div>
 
         <MovieSearch @searchTermUpdated="setSearchTerm" />
         <p>Selected movies: {{ selectedMovies.length }} </p>
-        <ul >
+        <ol >
             <li v-if="fillteredMovies.length === 0">
-                 <span style="font-weight:bold;" class="list-group-item list-group-item-danger">There is no movie with this title.</span></li>
+                <span style="font-weight:bold;" class="list-group-item list-group-item-danger">There is no movie with this title.</span></li>
             <li v-for="(movie, index) in fillteredMovies" :key="index">
-                <span style="font-weight:bold;" class="list-group-item list-group-item-info">
-                    <MovieRow :movie="movie" @selectMovie="markSelektedMovie" :isSelected="isSelected(movie.id)" />
-                </span>
+                <MovieRow :movie="movie" @selectMovie="markSelektedMovie" :isSelected="isSelected(movie.id)" />
+                <hr>
             </li>
-        </ul>
+        </ol>
+
     </div>
 </template>
 
@@ -34,13 +34,14 @@ export default {
         MovieRow,
         MovieSearch
     },
+
     data() {
         return {
             movies:[],
             errors:[],
             term:'',
             selectedMovies:[],
-
+            pageNumber: 0
         }
     },
 
@@ -56,12 +57,13 @@ export default {
             this.term = term;
         },
 
-        markSelektedMovie(movieId) {
-            console.log(movieId)
+        markSelektedMovie(movieId, index) {
             if(this.isSelected(movieId)){
-                return;
+                var index = this.selectedMovies.filter(movie => { return movieId; }).indexOf(movieId);
+                return this.selectedMovies.splice(index, 1);
+            } if(! this.isSelected(movieId)){
+                return this.selectedMovies.push(movieId);
             }
-            return this.selectedMovies.push(movieId);
         },
 
         isSelected(movieId) {
@@ -70,13 +72,51 @@ export default {
 
         selectAllMovies() {
             return this.selectedMovies = this.movies.map(movie => movie.id);
-            // console.log(this.selectedMovies);
         },
 
         deselectAllMovies() {
             return this.selectedMovies = [];
-            // console.log(this.selectedMovies);
-        }
+        },
+
+        sortByNameAsc() {
+            this.movies.sort((movie1, movie2) => {
+                var title1 = movie1.title.toUpperCase(); // ignore upper and lowercase
+                var title2 = movie2.title.toUpperCase(); 
+                if (title1 < title2) {
+                    return -1;
+                }
+                if (title1 > title2) {
+                    return 1;
+                }
+                return 0;
+            });
+        },
+
+        sortByNameDesc() {
+            this.movies.sort((movie1, movie2) => {
+                var title1 = movie1.title.toUpperCase(); // ignore upper and lowercase
+                var title2 = movie2.title.toUpperCase(); 
+                if (title2 < title1) {
+                    return -1;
+                }
+                if (title2 > title1) {
+                    return 1;
+                }
+                return 0;
+            });
+        },
+
+        sortByDurationAsc() {
+            this.movies.sort((movie1, movie2) => { 
+                return movie1.duration - movie2.duration 
+            });
+        },
+
+        sortByDurationDesc() {
+            this.movies.sort((movie1, movie2) => { 
+                return movie2.duration - movie1.duration 
+            });
+        },
     },
 
     computed: {
@@ -84,7 +124,7 @@ export default {
             return this.movies.filter(movie => {
                 return movie.title.toLowerCase().includes(this.term.toLowerCase())
             })
-        }
+        }, 
     },
 
 }
